@@ -1,14 +1,14 @@
             .______.______.______.
-          / RRRR | RRRR | RRRR / |
+          / RRRR / RRRR / RRRR / |
         .______.______.______. G |
-      / RRRR | RRRR | RRRR / | G .
+      / RRRR / RRRR / RRRR / | G .
     .______.______.______. G | / |
-  / RRRR | RRRR | RRRR / | G . G |
-.______.______.______. G | / | G .
-| RRRR | RRRR | RRRR | G . G | / |
+  / RRRR / RRRR / RRRR / | G . G |
+.______.______.______. GG| / | G .
+| RRRR | RRRR | RRRR |GG . G | / |
 | RRRR | RRRR | RRRR | / | G . G |
-.______.______.______. G | / | G .
-| GGGG | GGGG | GGGG | G . G | / 
+.______.______.______. GG| / | G .
+| GGGG | GGGG | GGGG |GG . G | / 
 | GGGG | GGGG | GGGG | / | G .
 .______.______.______. G | / 
 | GGGG | GGGG | GGGG | G .
