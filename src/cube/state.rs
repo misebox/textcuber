@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::ops;
 
 use termbox::{
     Attribute,
@@ -54,21 +55,6 @@ pub static EDGES: &'static [[Attribute; 2]; 12] = &[
     [YELLOW, MAGENTA],
 ];
 
-#[derive(Debug, Clone)]
-pub struct CubeState {
-    cp: [usize; 8],
-    co: [usize; 8],
-    ep: [usize; 12],
-    eo: [usize; 12],
-}
-
-pub static BASE: &'static CubeState = &CubeState {
-    cp: [0, 1, 2, 3, 4, 5, 6, 7],
-    co: [0; 8],
-    ep: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    eo: [0; 12],
-};
-
 
 #[derive(Clone)]
 pub enum Face {
@@ -79,6 +65,7 @@ pub enum Face {
     Left,
     Right,
 }
+
 
 pub fn get_color_char(color: Attribute) -> &'static str {
     match (color) {
@@ -93,6 +80,51 @@ pub fn get_color_char(color: Attribute) -> &'static str {
 }
 
 
+pub static MOVES: [&'static CubeState; 6] = [
+    // U
+    &CubeState {
+        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
+        co: [0usize; 8],
+        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        eo: [0usize; 12],
+    },
+    // D
+    &CubeState {
+        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
+        co: [0usize; 8],
+        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        eo: [0usize; 12],
+    },
+    // F
+    &CubeState {
+        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
+        co: [0usize; 8],
+        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        eo: [0usize; 12],
+    },
+    // B
+    &CubeState {
+        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
+        co: [0usize; 8],
+        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        eo: [0usize; 12],
+    },
+    // L
+    &CubeState {
+        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
+        co: [0usize; 8],
+        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        eo: [0usize; 12],
+    },
+    // R
+    &CubeState {
+        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
+        co: [0usize; 8],
+        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        eo: [0usize; 12],
+    },
+];
+
 //                   C0-0  E4-0  C1-0
 //                   E7-0   U    E5-0
 //                   C3-0  E6-0  C2-0
@@ -105,7 +137,60 @@ pub fn get_color_char(color: Attribute) -> &'static str {
 //                  E11-0   D    E9-0
 //                   C4-0  E8-0  C5-0
 
+#[derive(Debug, Clone)]
+pub struct CubeState {
+    cp: [usize; 8],
+    co: [usize; 8],
+    ep: [usize; 12],
+    eo: [usize; 12],
+}
+
+pub static BASE: &'static CubeState = &CubeState {
+    cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
+    co: [0usize; 8],
+    ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    eo: [0usize; 12],
+};
+
+impl ops::Add<CubeState> for CubeState {
+    type Output = CubeState;
+
+    fn add(self, mv: CubeState) -> CubeState {
+        println!("Added! ");
+        println!("{:?}", mv);
+        let cp: [usize; 8] = mv.cp.iter().map(|&n| self.cp[n] as usize)
+            .collect::<Vec<usize>>().try_into()
+            .unwrap_or_else(|_| panic!("Expected length 8"));
+
+        let co: [usize; 8] = mv.cp.into_iter().enumerate()
+            .map(|(i, n)| ((self.co[n] + mv.co[i]) % 3usize) as usize)
+            .collect::<Vec<usize>>().try_into()
+            .unwrap_or_else(|_| panic!("Expected length 8"));
+
+        let ep: [usize; 12] = mv.ep.iter().map(|&n| self.ep[n])
+            .collect::<Vec<usize>>().try_into()
+            .unwrap_or_else(|_| panic!("Expected length 12"));
+
+        let eo: [usize; 12] = mv.ep.into_iter().enumerate()
+            .map(|(i, n)| (self.eo[n] + mv.eo[i] % 2usize))
+            .collect::<Vec<usize>>().try_into()
+            .unwrap_or_else(|_| panic!("Expected length 12"));
+
+        CubeState {
+            cp,
+            co,
+            ep,
+            eo,
+        }
+    }
+
+}
+
 impl CubeState {
+    pub fn new(cp: [usize; 8], co: [usize; 8], ep: [usize; 12], eo: [usize; 12]) -> CubeState {
+       CubeState { cp: cp.clone(), co: co.clone(), ep: ep.clone(), eo: eo.clone() } 
+    }
+
     pub fn get_face_cells(&self, face: &Face) -> [Attribute; 9] {
         let center = CENTERS[face.clone() as usize];
         let cells: [Attribute; 9] = match face {
@@ -140,7 +225,11 @@ impl CubeState {
                 CORNERS[self.cp[6]][1],  EDGES[self.ep[9]][1], CORNERS[self.cp[5]][2],
             ],
         };
-        //cells[(yi * 3 + xi) as usize]
         cells
+    }
+
+    pub fn apply_move(self, face: Face, reverse: bool) -> CubeState {
+        let mv = MOVES[face as usize].clone();
+        self + mv
     }
 }
