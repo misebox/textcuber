@@ -6,7 +6,8 @@ use termbox::{
     Event, Termbox, BLACK, BLUE, BOLD, GREEN, KEY_ESC, KEY_SPACE, MAGENTA, RED, WHITE, YELLOW,
 };
 
-use cube::views::perspective::draw_cube;
+use cube::views::net::draw_cube;
+// use cube::views::perspective::draw_cube;
 
 
 fn main() {
@@ -18,8 +19,7 @@ fn main() {
     tb.set_clear_attributes(BLACK, BLACK);
     tb.clear();
 
-    tb.put_str(0, 0, "Hello, world!", WHITE | BOLD, BLACK);
-    tb.put_str(0, 1, "Press Esc to continue", WHITE, BLACK);
+    tb.put_str(0, 1, "Press Esc to exit", WHITE, BLACK);
     draw_cube(&mut tb, &state);
     tb.present();
 
@@ -34,7 +34,7 @@ fn main() {
             }
             match event.ch {
                 Some('j') => {
-                    tb.put_str(0, 2, "pressed A key", WHITE, BLACK);
+                    tb.put_str(0, 2, "pressed j key", WHITE, BLACK);
                     tb.present();
                 }
                 Some('q') => {
