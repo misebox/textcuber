@@ -1,16 +1,51 @@
             .______.______.______.
           / RRRR / RRRR / RRRR / |
-        .______.______.______. G |
-      / RRRR / RRRR / RRRR / | G .
-    .______.______.______. G | / |
-  / RRRR / RRRR / RRRR / | G . G |
-.______.______.______. GG| / | G .
-| RRRR | RRRR | RRRR |GG . G | / |
-| RRRR | RRRR | RRRR | / | G . G |
-.______.______.______. GG| / | G .
-| GGGG | GGGG | GGGG |GG . G | / 
-| GGGG | GGGG | GGGG | / | G .
-.______.______.______. G | / 
-| GGGG | GGGG | GGGG | G .
+        .______.______.______. YY|
+      / RRRR / RRRR / RRRR / |YY .
+    .______.______.______. YY| / |
+  / RRRR / RRRR / RRRR / |YY . YY|
+.______.______.______. YY| / |YY .
+| GGGG | GGGG | GGGG |YY . YY| / |
+| GGGG | GGGG | GGGG | / |YY . YY|
+.______.______.______. YY| / |YY .
+| GGGG | GGGG | GGGG |YY . YY| / 
+| GGGG | GGGG | GGGG | / |YY .
+.______.______.______. YY| / 
+| GGGG | GGGG | GGGG |YY .
 | GGGG | GGGG | GGGG | / 
 .______.______.______.
+
+
+     R   R   R
+   R   R   R     Y
+ R   R   R     Y  
+             Y   Y
+G   G   G      Y  
+             Y   Y
+G   G   G      Y  
+             Y    
+G   G   G    
+
+
+
+
+
+                B B B
+                B B B
+                B B B
+        
+                R R R
+                R R R
+                R R R
+        
+B B B   W W W   G G G   Y Y Y   B B B
+B B B   W W W   G G G   Y Y Y   B B B
+B B B   W W W   G G G   Y Y Y   B B B
+        
+                O O O
+                O O O
+                O O O
+
+                B B B
+                B B B
+                B B B
