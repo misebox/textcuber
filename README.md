@@ -2,6 +2,9 @@
 
 Rubik's cube simulator on terminal.
 
+References:
+- https://qiita.com/7y2n/items/a840e44dba77b1859352
+
 ## Requirements
 
 Rust 2021 Edition
@@ -52,4 +55,5 @@ Refs about these moves:
 - S move
 - Parsing the notation like "R U R' U' ..."
 - Adding more intuitive view
+
 
