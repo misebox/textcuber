@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::ops;
-use lazy_static::lazy_static;
+//use lazy_static::lazy_static;
 use termbox::{
     Attribute,
     BLACK,
@@ -226,24 +226,6 @@ impl CubeState {
         cells[(y * 3 + x) as usize]
     }
 
-    pub fn apply_move(self, face: Face, reverse: bool) -> CubeState {
-        // let moves = if reverse {REVERSED_MOVES} else {MOVES};
-        let mv = MOVES[face as usize].clone();
-        if reverse {
-            self - mv
-        } else {
-            self + mv 
-        }
-    }
-}
-lazy_static! {
-    static ref HASHMAP: HashMap<u32, &'static str> = {
-        let mut m = HashMap::new();
-        m.insert(0, "foo");
-        m.insert(1, "bar");
-        m.insert(2, "baz");
-        m
-    };
 }
 // MOVES
 pub static MOVE_U: &'static CubeState = &CubeState {
@@ -282,11 +264,3 @@ pub static MOVE_R: &'static CubeState = &CubeState {
     ep: [0, 5, 9, 3, 4, 2, 6, 7, 8, 1, 10, 11],
     eo: [0; 12],
 };
-pub static MOVES: [&'static CubeState; 6] = [
-    &*MOVE_U,
-    &*MOVE_D,
-    &*MOVE_F,
-    &*MOVE_B,
-    &*MOVE_L,
-    &*MOVE_R,
-];
