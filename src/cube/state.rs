@@ -78,7 +78,7 @@ pub fn get_color_char(color: Attribute) -> &'static str {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CubeState {
     cp: [usize; 8],
     co: [usize; 8],
@@ -120,7 +120,7 @@ impl ops::Add<CubeState> for CubeState {
 
         let ep: [usize; 12] = mv.ep.map(|n| self.ep[n]);
         let eo: [usize; 12] = mv.ep.into_iter().enumerate()
-            .map(|(i, n)| (self.eo[n] + mv.eo[i] % 2usize))
+            .map(|(i, n)| ((self.eo[n] + mv.eo[i]) % 2usize))
             .collect::<Vec<usize>>().try_into()
             .unwrap_or_else(|_| panic!("Expected length 12"));
 
@@ -245,3 +245,33 @@ pub static MOVE_R: &'static CubeState = &CubeState {
     ep: [0, 5, 9, 3, 4, 2, 6, 7, 8, 1, 10, 11],
     eo: [0; 12],
 };
+
+
+#[cfg(test)]
+mod test_for_moves {
+    use super::*;
+
+    pub static moves: [&CubeState; 6] = [
+        MOVE_U,
+        MOVE_D,
+        MOVE_F,
+        MOVE_B,
+        MOVE_L,
+        MOVE_R,
+    ];
+    #[test]
+    fn test_repeat_4_times_to_restore() {
+        for &mv in moves {
+            let state = BASE + mv + mv + mv + mv;
+            assert_eq!(BASE, state);
+        }
+    }
+    #[test]
+    fn test_subtract_is_equal_to_add_3_times() {
+        for &mv in moves {
+            let subtracted= BASE - mv;
+            let added_3_times= BASE + mv + mv + mv;
+            assert_eq!(subtracted, added_3_times);
+        }
+    }
+}
