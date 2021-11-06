@@ -38,8 +38,18 @@ SHIFT + F key -> anti-front
 SHIFT + B key -> anti-back
 SHIFT + L key -> anti-left
 SHIFT + R key -> anti-right
-
 ```
 Refs about these moves:
 - https://solvethecube.com/notation
 - https://ruwix.com/the-rubiks-cube/notation/
+
+## Featrues to be implemented
+- X move
+- Y move
+- Z move
+- M move
+- E move
+- S move
+- Parsing the notation like "R U R' U' ..."
+- Adding more intuitive view
+
