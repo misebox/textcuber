@@ -10,7 +10,7 @@ struct FaceView {
     x: i32,
     y: i32,
     // times of rotation to right
-    rotation: i32,
+    rotation: Rotation,
 }
 
 pub fn draw_cube(tb: &mut Termbox, state: &CubeState) {
@@ -29,15 +29,15 @@ pub fn draw_cube(tb: &mut Termbox, state: &CubeState) {
     let fg = BLACK;
 
     let face_views = [
-        FaceView {face: Face::Back , x: 2, y: 0, rotation: 2},
-        FaceView {face: Face::Up   , x: 2, y: 1, rotation: 0},
-        FaceView {face: Face::Back , x: 0, y: 2, rotation: 0},
-        FaceView {face: Face::Left , x: 1, y: 2, rotation: 0},
-        FaceView {face: Face::Front, x: 2, y: 2, rotation: 0},
-        FaceView {face: Face::Right, x: 3, y: 2, rotation: 0},
-        FaceView {face: Face::Back , x: 4, y: 2, rotation: 0},
-        FaceView {face: Face::Down , x: 2, y: 3, rotation: 0},
-        FaceView {face: Face::Back , x: 2, y: 4, rotation: 0},
+        FaceView {face: Face::Back , x: 2, y: 0, rotation: Rotation::UpsideDown},
+        FaceView {face: Face::Up   , x: 2, y: 1, rotation: Rotation::None},
+        FaceView {face: Face::Back , x: 0, y: 2, rotation: Rotation::None},
+        FaceView {face: Face::Left , x: 1, y: 2, rotation: Rotation::None},
+        FaceView {face: Face::Front, x: 2, y: 2, rotation: Rotation::None},
+        FaceView {face: Face::Right, x: 3, y: 2, rotation: Rotation::None},
+        FaceView {face: Face::Back , x: 4, y: 2, rotation: Rotation::None},
+        FaceView {face: Face::Down , x: 2, y: 3, rotation: Rotation::None},
+        FaceView {face: Face::Back , x: 2, y: 4, rotation: Rotation::UpsideDown},
     ];
     for fv in face_views {
         let cells = state.get_face_cells(&fv.face);
@@ -45,7 +45,8 @@ pub fn draw_cube(tb: &mut Termbox, state: &CubeState) {
             for xi in 0..3 {
                 let x = sx + face_width * fv.x + cell_wx * xi;
                 let y = sx + face_height * fv.y + cell_wy * yi;
-                let bg = cells[(yi * 3 + xi) as usize];
+                //let bg = cells[(yi * 3 + xi) as usize];
+                let bg = state.get_color_from_face_pos(&fv.face, xi, yi, &fv.rotation);
                 let ch = get_color_char(bg);
                 tb.put_str(x, y, ch, fg, bg);
                 tb.put_str(x+1, y, " ", fg, bg);

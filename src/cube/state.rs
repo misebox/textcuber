@@ -66,6 +66,13 @@ pub enum Face {
     Right,
 }
 
+pub enum Rotation {
+    None=0,
+    Right=1,
+    UpsideDown=2,
+    Left=3,
+}
+
 
 pub fn get_color_char(color: Attribute) -> &'static str {
     match (color) {
@@ -151,13 +158,19 @@ pub static BASE: &'static CubeState = &CubeState {
     ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     eo: [0usize; 12],
 };
+pub static MOVE_U: &'static CubeState = &CubeState {
+    cp: [3, 0usize, 1, 2, 4, 5, 6, 7],
+    co: [0usize; 8],
+    ep: [0usize, 1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11],
+    eo: [0usize; 12],
+};
 
 impl ops::Add<CubeState> for CubeState {
     type Output = CubeState;
 
     fn add(self, mv: CubeState) -> CubeState {
-        println!("Added! ");
-        println!("{:?}", mv);
+        //println!("Added! ");
+        //println!("{:?}", mv);
         let cp: [usize; 8] = mv.cp.iter().map(|&n| self.cp[n] as usize)
             .collect::<Vec<usize>>().try_into()
             .unwrap_or_else(|_| panic!("Expected length 8"));
@@ -226,6 +239,24 @@ impl CubeState {
             ],
         };
         cells
+    }
+    pub fn get_color_from_face_pos(&self, face: &Face, x: i32, y: i32, r: &Rotation) -> Attribute {
+        let mut cells = self.get_face_cells(face);
+        match r {
+            Rotation::None => {},
+            Rotation::UpsideDown => {
+                cells.reverse();
+            },
+            Rotation::Right => {
+                cells = cells.map(|n| n as i32)
+                    .map(|n| cells[((2 - n % 3) * 3 + n / 3) as usize]);
+            },
+            Rotation::Left => {
+                cells = cells.map(|n| n as i32)
+                    .map(|n| cells[(2 - n / 3 + (n % 3) * 3) as usize]);
+            },
+        }
+        cells[(y * 3 + x) as usize]
     }
 
     pub fn apply_move(self, face: Face, reverse: bool) -> CubeState {
