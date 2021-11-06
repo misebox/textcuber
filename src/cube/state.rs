@@ -111,21 +111,14 @@ impl ops::Add<CubeState> for CubeState {
     type Output = CubeState;
 
     fn add(self, mv: CubeState) -> CubeState {
-        //println!("Added! ");
-        //println!("{:?}", mv);
-        let cp: [usize; 8] = mv.cp.iter().map(|&n| self.cp[n] as usize)
-            .collect::<Vec<usize>>().try_into()
-            .unwrap_or_else(|_| panic!("Expected length 8"));
 
+        let cp: [usize; 8] = mv.cp.map(|n| self.cp[n] as usize);
         let co: [usize; 8] = mv.cp.into_iter().enumerate()
             .map(|(i, n)| ((self.co[n] + mv.co[i]) % 3usize) as usize)
             .collect::<Vec<usize>>().try_into()
             .unwrap_or_else(|_| panic!("Expected length 8"));
 
-        let ep: [usize; 12] = mv.ep.iter().map(|&n| self.ep[n])
-            .collect::<Vec<usize>>().try_into()
-            .unwrap_or_else(|_| panic!("Expected length 12"));
-
+        let ep: [usize; 12] = mv.ep.map(|n| self.ep[n]);
         let eo: [usize; 12] = mv.ep.into_iter().enumerate()
             .map(|(i, n)| (self.eo[n] + mv.eo[i] % 2usize))
             .collect::<Vec<usize>>().try_into()
@@ -149,10 +142,6 @@ impl ops::Sub<CubeState> for CubeState {
 }
 
 impl CubeState {
-    pub fn new(cp: [usize; 8], co: [usize; 8], ep: [usize; 12], eo: [usize; 12]) -> CubeState {
-       CubeState { cp: cp.clone(), co: co.clone(), ep: ep.clone(), eo: eo.clone() } 
-    }
-
     fn get_corner(&self, ci: usize, oi: usize) -> Attribute {
         let cp = self.cp[ci];
         let co = (self.co[ci] + oi) % 3usize;
