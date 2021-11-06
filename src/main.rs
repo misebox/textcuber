@@ -46,7 +46,7 @@ fn main() {
             } else {
             }
             match event.ch {
-                Some(ch) if "UDFBLRudfblrxyz'w".contains(&ch.to_string()) => {
+                Some(ch) if "UDFBLRMESXYZudfblrmesxyz".contains(&ch.to_string()) => {
                     tb.clear();
                     let c = format!("pressed {} key", &ch);
                     tb.put_str(0, 2, &c, WHITE, BLACK);
@@ -63,6 +63,7 @@ fn main() {
                         'L' => state - cube::MOVE_L.clone(),
                         'F' => state - cube::MOVE_F.clone(),
                         'B' => state - cube::MOVE_B.clone(),
+                        // TODO implement x,y,z,m,e,s
                         _ => state,
                     };
                     fn_draw_cube(&mut tb, &state);

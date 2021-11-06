@@ -1,9 +1,8 @@
-use std::collections::HashMap;
+// use std::collections::HashMap;
+// use lazy_static::lazy_static;
 use std::ops;
-//use lazy_static::lazy_static;
 use termbox::{
     Attribute,
-    BLACK,
     BLUE,
     RED,
     GREEN,
@@ -12,13 +11,6 @@ use termbox::{
     WHITE,
 };
 
-
-#[derive(Debug)]
-pub enum CubePart {
-    Center(Attribute),
-    Edge([Attribute; 2]),
-    Corner([Attribute; 3]),
-}
 
 pub static CENTERS: &'static [Attribute] = &[
     WHITE,
