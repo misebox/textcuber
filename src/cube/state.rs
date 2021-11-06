@@ -136,7 +136,7 @@ impl ops::Sub<CubeState> for CubeState {
     type Output = CubeState;
 
     fn sub(self, mv: CubeState) -> CubeState {
-        self + mv.clone() + mv.clone() + mv
+        self + mv + mv + mv
     }
 
 }
@@ -206,8 +206,8 @@ impl CubeState {
         }
         cells[(y * 3 + x) as usize]
     }
-
 }
+
 // MOVES
 pub static MOVE_U: &'static CubeState = &CubeState {
     cp: [3, 0, 1, 2, 4, 5, 6, 7],
@@ -248,7 +248,7 @@ pub static MOVE_R: &'static CubeState = &CubeState {
 
 
 #[cfg(test)]
-mod test_for_moves {
+mod test {
     use super::*;
 
     pub static moves: [&CubeState; 6] = [
@@ -259,6 +259,84 @@ mod test_for_moves {
         MOVE_L,
         MOVE_R,
     ];
+    #[test]
+    fn test_base_plus_base_is_base() {
+        assert_eq!(BASE, BASE + BASE);
+        assert_eq!(BASE, BASE + BASE + BASE);
+        assert_eq!(BASE, BASE + BASE + BASE + BASE);
+    }
+    #[test]
+    fn test_base_minus_base_is_base() {
+        assert_eq!(BASE, BASE - BASE);
+        assert_eq!(BASE, BASE - BASE - BASE);
+        assert_eq!(BASE, BASE - BASE - BASE - BASE);
+    }
+    #[test]
+    fn test_get_corner() {
+        assert_eq!(WHITE, BASE.get_corner(0, 0));
+        assert_eq!(WHITE, BASE.get_corner(1, 0));
+        assert_eq!(WHITE, BASE.get_corner(2, 0));
+        assert_eq!(WHITE, BASE.get_corner(3, 0));
+        assert_eq!(YELLOW, BASE.get_corner(4, 0));
+        assert_eq!(YELLOW, BASE.get_corner(5, 0));
+        assert_eq!(YELLOW, BASE.get_corner(6, 0));
+        assert_eq!(YELLOW, BASE.get_corner(7, 0));
+        // rotate corner 1 time
+        assert_eq!(BLUE,    BASE.get_corner(0, 1));
+        assert_eq!(RED,     BASE.get_corner(1, 1));
+        assert_eq!(GREEN,   BASE.get_corner(2, 1));
+        assert_eq!(MAGENTA, BASE.get_corner(3, 1));
+        assert_eq!(MAGENTA, BASE.get_corner(4, 1));
+        assert_eq!(BLUE,    BASE.get_corner(5, 1));
+        assert_eq!(RED,     BASE.get_corner(6, 1));
+        assert_eq!(GREEN,   BASE.get_corner(7, 1));
+        // rotate corner 2 times
+        assert_eq!(MAGENTA, BASE.get_corner(0, 2));
+        assert_eq!(BLUE,    BASE.get_corner(1, 2));
+        assert_eq!(RED,     BASE.get_corner(2, 2));
+        assert_eq!(GREEN,   BASE.get_corner(3, 2));
+        assert_eq!(BLUE,    BASE.get_corner(4, 2));
+        assert_eq!(RED,     BASE.get_corner(5, 2));
+        assert_eq!(GREEN,   BASE.get_corner(6, 2));
+        assert_eq!(MAGENTA, BASE.get_corner(7, 2));
+    }
+    #[test]
+    fn test_get_edge() {
+        assert_eq!(   BLUE, BASE.get_edge( 0, 0));
+        assert_eq!(   BLUE, BASE.get_edge( 1, 0));
+        assert_eq!(  GREEN, BASE.get_edge( 2, 0));
+        assert_eq!(  GREEN, BASE.get_edge( 3, 0));
+        assert_eq!(  WHITE, BASE.get_edge( 4, 0));
+        assert_eq!(  WHITE, BASE.get_edge( 5, 0));
+        assert_eq!(  WHITE, BASE.get_edge( 6, 0));
+        assert_eq!(  WHITE, BASE.get_edge( 7, 0));
+        assert_eq!( YELLOW, BASE.get_edge( 8, 0));
+        assert_eq!( YELLOW, BASE.get_edge( 9, 0));
+        assert_eq!( YELLOW, BASE.get_edge(10, 0));
+        assert_eq!( YELLOW, BASE.get_edge(11, 0));
+        // other side
+        assert_eq!(MAGENTA, BASE.get_edge( 0, 1));
+        assert_eq!(    RED, BASE.get_edge( 1, 1));
+        assert_eq!(    RED, BASE.get_edge( 2, 1));
+        assert_eq!(MAGENTA, BASE.get_edge( 3, 1));
+        assert_eq!(   BLUE, BASE.get_edge( 4, 1));
+        assert_eq!(    RED, BASE.get_edge( 5, 1));
+        assert_eq!(  GREEN, BASE.get_edge( 6, 1));
+        assert_eq!(MAGENTA, BASE.get_edge( 7, 1));
+        assert_eq!(   BLUE, BASE.get_edge( 8, 1));
+        assert_eq!(    RED, BASE.get_edge( 9, 1));
+        assert_eq!(  GREEN, BASE.get_edge(10, 1));
+        assert_eq!(MAGENTA, BASE.get_edge(11, 1));
+    }
+    #[test]
+    fn test_add_orientation() {
+        let state = CubeState {
+            cp: [0, 1, 2, 3, 4, 5, 6, 7],
+            co: [0, 0, 0, 0, 0, 0, 0, 0],
+            ep: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            eo: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0],
+        };
+    }
     #[test]
     fn test_repeat_4_times_to_restore() {
         for &mv in moves {
