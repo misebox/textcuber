@@ -1,7 +1,7 @@
 use super::super::state;
 
 use termbox::{
-    Termbox, BLACK, BLUE, BOLD, GREEN, MAGENTA, RED, WHITE, YELLOW,
+    Termbox, BLACK, WHITE,
 };
 
 
@@ -60,11 +60,11 @@ pub fn draw_cube(tb: &mut Termbox, state: &state::CubeState) {
     let u_cells = state.get_face_cells(&state::Face::Up);
     for yi in 0..3 {
         for xi in 0..3 {
-            let x = sx + half_tilt + (edge_len as i32 + 1) * xi + tilt * yi;
-            let y = sy + 2 * (3 - yi);
+            let x = sx + half_tilt + (edge_len as i32 + 1) * xi + tilt * (2 - yi);
+            let y = sy + 1 + 2 * yi;
             let bg = u_cells[(yi * 3 + xi) as usize];
             let ch = state::get_color_char(bg);
-            tb.put_str(x + half_tilt, y - 1, &ch.repeat(4), fg, bg);
+            tb.put_str(x + half_tilt, y, &ch.repeat(4), fg, bg);
         }
     }
 

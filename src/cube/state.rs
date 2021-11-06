@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::ops;
-
+use lazy_static::lazy_static;
 use termbox::{
     Attribute,
     BLACK,
@@ -86,51 +86,21 @@ pub fn get_color_char(color: Attribute) -> &'static str {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct CubeState {
+    cp: [usize; 8],
+    co: [usize; 8],
+    ep: [usize; 12],
+    eo: [usize; 12],
+}
 
-pub static MOVES: [&'static CubeState; 6] = [
-    // U
-    &CubeState {
-        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
-        co: [0usize; 8],
-        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        eo: [0usize; 12],
-    },
-    // D
-    &CubeState {
-        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
-        co: [0usize; 8],
-        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        eo: [0usize; 12],
-    },
-    // F
-    &CubeState {
-        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
-        co: [0usize; 8],
-        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        eo: [0usize; 12],
-    },
-    // B
-    &CubeState {
-        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
-        co: [0usize; 8],
-        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        eo: [0usize; 12],
-    },
-    // L
-    &CubeState {
-        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
-        co: [0usize; 8],
-        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        eo: [0usize; 12],
-    },
-    // R
-    &CubeState {
-        cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
-        co: [0usize; 8],
-        ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        eo: [0usize; 12],
-    },
-];
+pub static BASE: CubeState = CubeState {
+    cp: [0, 1, 2, 3, 4, 5, 6, 7],
+    co: [0; 8],
+    ep: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    eo: [0; 12],
+};
+
 
 //                   C0-0  E4-0  C1-0
 //                   E7-0   U    E5-0
@@ -144,26 +114,6 @@ pub static MOVES: [&'static CubeState; 6] = [
 //                  E11-0   D    E9-0
 //                   C4-0  E8-0  C5-0
 
-#[derive(Debug, Clone)]
-pub struct CubeState {
-    cp: [usize; 8],
-    co: [usize; 8],
-    ep: [usize; 12],
-    eo: [usize; 12],
-}
-
-pub static BASE: &'static CubeState = &CubeState {
-    cp: [0usize, 1, 2, 3, 4, 5, 6, 7],
-    co: [0usize; 8],
-    ep: [0usize, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    eo: [0usize; 12],
-};
-pub static MOVE_U: &'static CubeState = &CubeState {
-    cp: [3, 0usize, 1, 2, 4, 5, 6, 7],
-    co: [0usize; 8],
-    ep: [0usize, 1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11],
-    eo: [0usize; 12],
-};
 
 impl ops::Add<CubeState> for CubeState {
     type Output = CubeState;
@@ -196,6 +146,13 @@ impl ops::Add<CubeState> for CubeState {
             eo,
         }
     }
+}
+impl ops::Sub<CubeState> for CubeState {
+    type Output = CubeState;
+
+    fn sub(self, mv: CubeState) -> CubeState {
+        self + mv.clone() + mv.clone() + mv
+    }
 
 }
 
@@ -204,38 +161,48 @@ impl CubeState {
        CubeState { cp: cp.clone(), co: co.clone(), ep: ep.clone(), eo: eo.clone() } 
     }
 
+    fn get_corner(&self, ci: usize, oi: usize) -> Attribute {
+        let cp = self.cp[ci];
+        let co = (self.co[ci] + oi) % 3usize;
+        CORNERS[cp][co]
+    }
+    fn get_edge(&self, ei: usize, oi: usize) -> Attribute {
+        let ep = self.ep[ei];
+        let eo = (self.eo[ei] + oi) % 2;
+        EDGES[ep][eo]
+    }
     pub fn get_face_cells(&self, face: &Face) -> [Attribute; 9] {
         let center = CENTERS[face.clone() as usize];
         let cells: [Attribute; 9] = match face {
             Face::Up => [
-                CORNERS[self.cp[0]][0],  EDGES[self.ep[4]][0], CORNERS[self.cp[1]][0],
-                  EDGES[self.ep[7]][0],                center,   EDGES[self.ep[5]][0],
-                CORNERS[self.cp[3]][0],  EDGES[self.ep[6]][0], CORNERS[self.cp[2]][0],
+                self.get_corner(0, 0), self.get_edge(4, 0), self.get_corner(1, 0),
+                self.get_edge(7, 0),                       center,   self.get_edge(5, 0),
+                self.get_corner(3, 0), self.get_edge(6, 0), self.get_corner(2, 0),
             ],
             Face::Down => [
-                CORNERS[self.cp[7]][0], EDGES[self.ep[10]][0], CORNERS[self.cp[6]][0],
-                 EDGES[self.ep[11]][0],                center,   EDGES[self.ep[9]][0],
-                CORNERS[self.cp[4]][0], EDGES[self.ep[10]][0], CORNERS[self.cp[5]][0],
+                self.get_corner(7, 0), self.get_edge(10, 0), self.get_corner(6, 0),
+                self.get_edge(11, 0),                       center,   self.get_edge(9, 0),
+                self.get_corner(4, 0),  self.get_edge(8, 0), self.get_corner(5, 0),
             ],
             Face::Front => [
-                CORNERS[self.cp[3]][2],  EDGES[self.ep[6]][1], CORNERS[self.cp[2]][1],
-                  EDGES[self.ep[3]][0],                center,   EDGES[self.ep[2]][0],
-                CORNERS[self.cp[7]][1], EDGES[self.ep[10]][1], CORNERS[self.cp[6]][2],
+                self.get_corner(3, 2),  self.get_edge(6, 1), self.get_corner(2, 1),
+                self.get_edge(3, 0),                        center,   self.get_edge(2, 0),
+                self.get_corner(7, 1), self.get_edge(10, 1), self.get_corner(6, 2),
             ],
             Face::Back => [
-                CORNERS[self.cp[1]][2],  EDGES[self.ep[4]][1], CORNERS[self.cp[0]][1],
-                  EDGES[self.ep[1]][0],                center,   EDGES[self.ep[0]][0],
-                CORNERS[self.cp[5]][1],  EDGES[self.ep[8]][1], CORNERS[self.cp[4]][2],
+                self.get_corner(1, 2), self.get_edge(4, 1), self.get_corner(0, 1),
+                  self.get_edge(1, 0),                     center,   self.get_edge(0, 0),
+                self.get_corner(5, 1), self.get_edge(8, 1), self.get_corner(4, 2),
             ],
             Face::Left => [
-                CORNERS[self.cp[0]][2],  EDGES[self.ep[7]][1], CORNERS[self.cp[3]][1],
-                  EDGES[self.ep[0]][1],                center,   EDGES[self.ep[3]][1],
-                CORNERS[self.cp[4]][1], EDGES[self.ep[11]][1], CORNERS[self.cp[7]][2],
+                self.get_corner(0, 2),  self.get_edge(7, 1), self.get_corner(3, 1),
+                  self.get_edge(0, 1),                      center,   self.get_edge(3, 1),
+                self.get_corner(4, 1), self.get_edge(11, 1), self.get_corner(7, 2),
             ],
             Face::Right => [
-                CORNERS[self.cp[2]][2],  EDGES[self.ep[5]][1], CORNERS[self.cp[1]][1],
-                  EDGES[self.ep[2]][1],                center,   EDGES[self.ep[1]][1],
-                CORNERS[self.cp[6]][1],  EDGES[self.ep[9]][1], CORNERS[self.cp[5]][2],
+                self.get_corner(2, 2), self.get_edge(5, 1), self.get_corner(1, 1),
+                  self.get_edge(2, 1),                     center,   self.get_edge(1, 1),
+                self.get_corner(6, 1), self.get_edge(9, 1), self.get_corner(5, 2),
             ],
         };
         cells
@@ -260,7 +227,66 @@ impl CubeState {
     }
 
     pub fn apply_move(self, face: Face, reverse: bool) -> CubeState {
+        // let moves = if reverse {REVERSED_MOVES} else {MOVES};
         let mv = MOVES[face as usize].clone();
-        self + mv
+        if reverse {
+            self - mv
+        } else {
+            self + mv 
+        }
     }
 }
+lazy_static! {
+    static ref HASHMAP: HashMap<u32, &'static str> = {
+        let mut m = HashMap::new();
+        m.insert(0, "foo");
+        m.insert(1, "bar");
+        m.insert(2, "baz");
+        m
+    };
+}
+// MOVES
+pub static MOVE_U: &'static CubeState = &CubeState {
+    cp: [3, 0, 1, 2, 4, 5, 6, 7],
+    co: [0; 8],
+    ep: [0, 1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11],
+    eo: [0; 12],
+};
+pub static MOVE_D: &'static CubeState = &CubeState {
+    cp: [0, 1, 2, 3, 5, 6, 7, 4],
+    co: [0; 8],
+    ep: [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 8],
+    eo: [0; 12],
+};
+pub static MOVE_F: &'static CubeState = &CubeState {
+    cp: [0, 1, 3, 7, 4, 5, 2, 6],
+    co: [0, 0, 1, 2, 0, 0, 2, 1],
+    ep: [0, 1, 6, 10, 4, 5, 3, 7, 8, 9, 2, 11],
+    eo: [0, 0, 1,  1, 0, 0, 1, 0, 0, 0, 1, 0],
+};
+pub static MOVE_B: &'static CubeState = &CubeState {
+    cp: [1, 5, 2, 3, 0, 4, 6, 7],
+    co: [1, 2, 0, 0, 2, 1, 0, 0],
+    ep: [4, 8, 2, 3, 1, 5, 6, 7, 0, 9, 10, 11],
+    eo: [1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+};
+pub static MOVE_L: &'static CubeState = &CubeState {
+    cp: [4, 1, 2, 0, 7, 5, 6, 3],
+    co: [2, 0, 0, 1, 1, 0, 0, 2],
+    ep: [11, 1, 2, 7, 4, 5, 6, 0, 8, 9, 10, 3],
+    eo: [0; 12],
+};
+pub static MOVE_R: &'static CubeState = &CubeState {
+    cp: [0, 2, 6, 3, 4, 1, 5, 7],
+    co: [0, 1, 2, 0, 0, 2, 1, 0],
+    ep: [0, 5, 9, 3, 4, 2, 6, 7, 8, 1, 10, 11],
+    eo: [0; 12],
+};
+pub static MOVES: [&'static CubeState; 6] = [
+    &*MOVE_U,
+    &*MOVE_D,
+    &*MOVE_F,
+    &*MOVE_B,
+    &*MOVE_L,
+    &*MOVE_R,
+];
