@@ -10,19 +10,44 @@ use termbox::{
 // use cube::views::net::draw_cube;
 use cube::views;
 
+fn notation_from_char(ch: char) -> &'static str {
+    match ch {
+        'u' => "U",
+        'd' => "D",
+        'f' => "F",
+        'b' => "B",
+        'l' => "L",
+        'r' => "R",
+        'U' => "U'",
+        'D' => "D'",
+        'F' => "F'",
+        'B' => "B'",
+        'L' => "L'",
+        'R' => "R'",
+        // TODO implement x,y,z,m,e,s
+        _ => ".",
+    }
+}
+
+fn print_seq(tb: &mut Termbox, seq: &Vec<&str>) {
+    let joined = seq.join(" ");
+    let s = format!("Sequence: {}", &joined);
+    tb.put_str(2, 1, &s, WHITE, BLACK);
+}
 fn main() {
     let mut state = cube::BASE.clone();
     let mut tb = Termbox::open().unwrap();
     let views = [views::perspective::draw_cube, views::net::draw_cube];
     let mut view_idx: usize = 0usize;
     let mut fn_draw_cube = views[view_idx];
+    let mut seq: Vec<&str> = Vec::new();
 
     // Clear the screen to black
     tb.set_clear_attributes(BLACK, BLACK);
     tb.clear();
-
-    tb.put_str(0, 1, "Press Esc to exit", WHITE, BLACK);
+    tb.put_str(0, 0, "Press Esc to exit", WHITE, BLACK);
     fn_draw_cube(&mut tb, &state);
+    print_seq(&mut tb, &seq);
     tb.present();
 
     loop {
@@ -33,23 +58,19 @@ fn main() {
             }
             #[allow(clippy::if_same_then_else)]
             if event.key == KEY_SPACE {
-                fn_draw_cube(&mut tb, &state);
             } else if event.key == KEY_ENTER {
-                fn_draw_cube(&mut tb, &state);
+                seq.clear();
             } else if event.key == KEY_BACKSPACE || event.key == KEY_BACKSPACE2 {
-                fn_draw_cube(&mut tb, &state);
+                state = cube::BASE;
+                seq.clear();
             } else if event.key == KEY_TAB {
                 view_idx = ((view_idx as i32 + 1) % 2) as usize;
                 fn_draw_cube = views[view_idx];
-                tb.clear();
-                fn_draw_cube(&mut tb, &state);
             } else {
             }
             match event.ch {
                 Some(ch) if "UDFBLRMESXYZudfblrmesxyz".contains(&ch.to_string()) => {
                     tb.clear();
-                    let c = format!("pressed {} key", &ch);
-                    tb.put_str(0, 2, &c, WHITE, BLACK);
                     state = match ch {
                         'u' => state + cube::MOVE_U.clone(),
                         'r' => state + cube::MOVE_R.clone(),
@@ -66,8 +87,7 @@ fn main() {
                         // TODO implement x,y,z,m,e,s
                         _ => state,
                     };
-                    fn_draw_cube(&mut tb, &state);
-                    tb.present();
+                    seq.push(notation_from_char(ch));
                 }
                 Some('u') => {}
                 Some('q') => {
@@ -77,6 +97,11 @@ fn main() {
                 Some(_) => {}
                 None => {}
             }
+            tb.clear();
+            tb.put_str(0, 0, "Press Esc to exit", WHITE, BLACK);
+            fn_draw_cube(&mut tb, &state);
+            print_seq(&mut tb, &seq);
+            tb.present();
         }
     }
 }
