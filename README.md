@@ -46,7 +46,7 @@ Refs about these moves:
 - https://solvethecube.com/notation
 - https://ruwix.com/the-rubiks-cube/notation/
 
-## Featrues to be implemented
+## Features to be implemented
 - X move
 - Y move
 - Z move
